@@ -581,7 +581,7 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         log.debug("printing all users...");
-        this.users.findAll().forEach(v -> log.debug(" User :" + v.toString()));
+        this.users.findAll().forEach(v -> log.debug(UserDTO + v.toString()));
     }
 }
 ```

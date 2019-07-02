@@ -3,7 +3,7 @@ package com.example.demo;
 import com.example.demo.domain.Vehicle;
 import com.example.demo.repository.VehicleRepository;
 import com.example.demo.web.VehicleController;
-import com.example.demo.web.VehicleForm;
+import com.example.demo.dto.VehicleForm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,7 +1,5 @@
 package com.example.demo.config;
 
-import com.example.demo.security.jwt.JwtSecurityConfigurer;
-import com.example.demo.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,29 +11,32 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.example.demo.security.jwt.JwtSecurityConfigurer;
+import com.example.demo.security.jwt.JwtTokenProvider;
+
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
+	@Autowired
+	JwtTokenProvider jwtTokenProvider;
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        //@formatter:off
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		//@formatter:off
         http
             .httpBasic().disable()
             .csrf().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
                 .authorizeRequests()
-                .antMatchers("/auth/signin").permitAll()
+                .antMatchers("/auth/login").permitAll()
                 .antMatchers(HttpMethod.GET, "/vehicles/**").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/vehicles/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/v1/vehicles/**").permitAll()
@@ -43,13 +44,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .apply(new JwtSecurityConfigurer(jwtTokenProvider));
         //@formatter:on
-    }
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
 
 
 }

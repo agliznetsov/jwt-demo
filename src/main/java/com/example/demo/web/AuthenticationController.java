@@ -1,51 +1,62 @@
 package com.example.demo.web;
 
-import com.example.demo.repository.UserRepository;
-import com.example.demo.security.jwt.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.example.demo.domain.User;
+import com.example.demo.dto.AuthenticationRequest;
+import com.example.demo.dto.AuthenticationResponse;
+import com.example.demo.dto.UserDTO;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.jwt.JwtTokenProvider;
 
-import static org.springframework.http.ResponseEntity.ok;
+import ma.glasnost.orika.MapperFacade;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+	@Autowired
+	AuthenticationManager authenticationManager;
 
-    @Autowired
-    JwtTokenProvider jwtTokenProvider;
+	@Autowired
+	JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    UserRepository users;
+	@Autowired
+	UserRepository userRepository;
 
-    @PostMapping("/signin")
-    public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
+	@Autowired
+	MapperFacade mapperFacade;
 
-        try {
-            String username = data.getUsername();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
-            String token = jwtTokenProvider.createToken(username, this.users.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
+	@PostMapping("/login")
+	public AuthenticationResponse signin(@RequestBody AuthenticationRequest data) {
+		String username = data.getUsername();
+		authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
+		User user = this.userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found"));
+		String token = jwtTokenProvider.createToken(username, user.getRoles());
 
-            Map<Object, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("token", token);
-            return ok(model);
-        } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username/password supplied");
-        }
-    }
+		return AuthenticationResponse.builder()
+				.token(token)
+				.user(mapperFacade.map(user, UserDTO.class))
+				.build();
+	}
+
+	@GetMapping("/me")
+	public UserDTO currentUser(@AuthenticationPrincipal UserDetails userDetails) {
+		User user = this.userRepository.findByUsername(userDetails.getUsername())
+				.orElseThrow(
+						() -> new UsernameNotFoundException("Username " + userDetails.getUsername() + "not found"));
+
+		return mapperFacade.map(user, UserDTO.class);
+	}
 }

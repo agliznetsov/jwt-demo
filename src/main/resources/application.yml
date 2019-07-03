@@ -30,6 +30,5 @@ spring:
 
 logging:
   level:
-    org.springframework.web: INFO
-    org.springframework.security: DEBUG
+    root: INFO
     com.example: DEBUG

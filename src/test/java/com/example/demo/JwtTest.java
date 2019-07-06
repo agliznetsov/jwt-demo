@@ -1,0 +1,42 @@
+package com.example.demo;
+
+import java.security.KeyFactory;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+import org.junit.Test;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
+
+public class JwtTest {
+
+	String rsa_pub = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkqdYRakCaCb/J0LI2QqhlJBO3V40hdJRcueC5wlMTFns53/cRKF72WOO2/I3USaJGU+564UaFgvNhW3lxOAKM+rDa2g7NVjp5267lfgNz4k7qIg2MpHWNZm3ZEJeHTmo2WUpFSDcsr6+y1T5sLNlmAP58eZilIxebwt3BFNKT1zSG3ykz9p5JwdBusbIsEZAwEaYCrj3gf48ClXlq34AcD53voaEE/u8lPvC1geRRiNX/H92EOjcpn/vXoloFSAsn3WiDzig3Sko1vZfyYrVjT/lcy9BK3RigWmgCZBs6UGteHEbocMjQXp2XoySXRmvxUyxV8RapL8Jz9kjIKi9CQIDAQAB";
+
+	@Test
+	public void test_token() throws Exception {
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(rsa_pub));
+		RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+
+
+		String token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5M0F0RkdpYnhTYUdMaGFVb05GTHlZVXFZZWoweGVrNkZhVkNXQ2w4MjAwIn0.eyJqdGkiOiIwMzgwYzUxMi0wYjVlLTRlMTEtOWFiMy1mODZhYzVmYWIzMGIiLCJleHAiOjE1NjI0Mjg3NDAsIm5iZiI6MCwiaWF0IjoxNTYyNDI4MjAwLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvYXV0aC9yZWFsbXMvbWFzdGVyIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjE3MmZmZjVmLWI5YjktNGJlZi1hMGFhLWExMjZmYzIyNzRhNyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImRlbW8iLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiIxZmYxYTIxMC1lNGU4LTQ0YjctYjQ3ZS01Mjg1MjBlYzQ5MGIiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbInJvbGUxIiwicm9sZTIiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ1c2VyIn0.kE9mXFz1n7DV08xIW01OacBzaaO2r8TqgL0hA35MTtrKu0tt2rLgoeVAS__YIcGD5PWhiopkk9VInCNXGK02EG4-jI8Lc8olXjDO8WvDflgH1Y2vqxmLrf9Zzn-7qGQXLN1IiaMIL8r83x3IXKOlQ6NEM3o1vb8uPUwwaZuw_9N3OOnRev-I3lcld_Xu2_4Knq8zYWtqDqBJ1GGk-PIs5yiP5UivTAxO5e0EHTVjQp7cQPhBL5zjb7L216IKs9UC9IaqJr3CNwG5cZB98owrjypPUQHKhc3rv4mez0XuLIuSU6_O-XNkA_igDeGpcXO5148MIO8-Oa3De7SbC5CW5g";
+
+
+		Jws<Claims> claims = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(token);
+
+		System.out.println(claims);
+
+	}
+
+	@Test
+	public void test_key() throws Exception {
+		KeyFactory kf = KeyFactory.getInstance("RSA");
+		X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(Base64.getDecoder().decode(rsa_pub));
+		RSAPublicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
+
+		System.out.println(pubKey);
+	}
+}
